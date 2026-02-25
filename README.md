@@ -2,7 +2,28 @@
 
 **AI-powered financial companion for South Africans**
 
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/TyriieSolutions/PocketAccountant)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red)](LICENSE)
+
 PocketAccountant is an all-in-one financial platform that combines full-spectrum bookkeeping, SARS-savvy tax intelligence, and automated mileage tracking in one intuitive platform. It acts like a private accountant in your pocket, learning your habits, automating the mundane, and giving you peace of mind through a simple chat interface.
+
+## 📦 Repository Status
+
+**Foundation Complete** ✅
+- ✅ Docker development environment set up
+- ✅ PostgreSQL database with double-entry accounting schema
+- ✅ n8n workflow engine configured
+- ✅ Backend structure with Node.js/Express
+- ✅ Comprehensive documentation created
+- ✅ GitHub repository initialized
+
+**Services Running:**
+- **PostgreSQL Database**: `localhost:5433`
+- **n8n Workflow Engine**: http://localhost:5678
+- **Adminer Database UI**: http://localhost:8080
+- **All containers healthy and running**
+
+**Next Phase**: Sprint 1 - Backend Implementation
 
 ## 🎯 Vision
 
@@ -84,7 +105,7 @@ To build the first AI-native financial companion that truly understands South Af
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/TyriieSolutions/PocketAccountant.git
    cd PocketAccountant
    ```
 
@@ -100,11 +121,15 @@ To build the first AI-native financial companion that truly understands South Af
    ```
 
 4. **Access the services**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
-   - n8n Workflow Engine: http://localhost:5678
-   - Adminer (Database UI): http://localhost:8080
-   - PostgreSQL: localhost:5432
+   - **n8n Workflow Engine**: http://localhost:5678
+     - Default credentials: email `n8n@example.com`, password `password`
+   - **Adminer (Database UI)**: http://localhost:8080
+     - System: PostgreSQL
+     - Server: `postgres`
+     - Username: `pocketadmin`
+     - Password: `changeme123`
+     - Database: `pocketaccountant`
+   - **PostgreSQL Database**: `localhost:5433`
 
 ### Development Setup
 
@@ -115,22 +140,16 @@ To build the first AI-native financial companion that truly understands South Af
    npm run dev
    ```
 
-2. **Frontend Development**
+2. **Database Management**
    ```bash
-   cd frontend
-   npm install
-   npm start
+   # Access database via Adminer: http://localhost:8080
+   # Or via command line:
+   docker exec -it pocketaccountant-postgres psql -U pocketadmin -d pocketaccountant
    ```
 
-3. **Mobile Development**
-   ```bash
-   cd mobile
-   npm install
-   # For iOS
-   npx react-native run-ios
-   # For Android
-   npx react-native run-android
-   ```
+3. **n8n Workflow Development**
+   - Access n8n at http://localhost:5678
+   - Create workflows for transaction categorization, SARS Q&A, invoice generation
 
 ## 📁 Project Structure
 
@@ -142,32 +161,33 @@ PocketAccountant/
 │   │   ├── models/
 │   │   ├── routes/
 │   │   ├── services/
-│   │   └── utils/
+│   │   ├── utils/
+│   │   ├── middleware/
+│   │   └── database/
 │   ├── package.json
 │   └── Dockerfile
-├── frontend/          # React web application
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   └── styles/
-│   ├── package.json
-│   └── Dockerfile
-├── mobile/           # React Native mobile app
-│   ├── src/
-│   │   ├── components/
-│   │   ├── screens/
-│   │   ├── navigation/
-│   │   └── services/
-│   ├── package.json
-│   └── app.json
+├── frontend/          # React web application (to be created)
+├── mobile/           # React Native mobile app (to be created)
 ├── workflows/        # n8n workflow exports
 ├── docker/           # Docker configurations
 │   └── postgres/
-│       └── init.sql
+│       └── init.sql  # Database initialization
 ├── docs/            # Documentation
 ├── ProjectDocumentation/ # Project documentation
-└── docker-compose.yml
+│   ├── DevImplementation/
+│   │   ├── ImplementationSteps.txt
+│   │   ├── ImplementationNotes.txt
+│   │   └── ErrorTroubleshooting.txt
+│   ├── ForDevTeam.txt
+│   ├── FoundersVision.txt
+│   ├── RequiredCredentials.txt
+│   └── StepByStepImplementationPlan.txt
+├── docker-compose.yml
+├── .env.example
+├── .gitignore
+├── README.md
+├── DEVELOPMENT_GUIDE.md
+└── InstructionsToFounder.txt
 ```
 
 ## 🔧 Development Workflow
