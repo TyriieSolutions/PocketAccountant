@@ -1,0 +1,151 @@
+# PocketAccountant Implementation Steps
+
+## Phase 1: MVP (Months 1-2) - Core Bookkeeping + SARS Q&A
+
+### Sprint 1 (Week 1-2): Foundation Setup
+- [ ] Set up Docker environment for n8n, PostgreSQL, and backend services
+- [ ] Configure DeepSeek API connection and test basic integration
+- [ ] Implement user authentication system (email/password with JWT)
+- [ ] Design and create core database schema (users, accounts, transactions, invoices)
+- [ ] Build n8n workflow for manual transaction entry
+- [ ] Create DeepSeek categorization workflow for transactions
+
+**Test after Sprint 1:**
+- Verify Docker containers are running (n8n, PostgreSQL)
+- Test DeepSeek API connection with sample prompts
+- Test user registration and login flow
+- Verify database schema creation and basic CRUD operations
+
+### Sprint 2 (Week 3-4): SARS Knowledge Base & AI Assistant
+- [ ] Collect and organize SARS public documents (guides, ITR12 forms, TaxTim content)
+- [ ] Set up vector database for RAG (Retrieval-Augmented Generation)
+- [ ] Build document ingestion pipeline for SARS knowledge base
+- [ ] Create n8n workflow for SARS Q&A: user question → retrieve context → call DeepSeek → return answer
+- [ ] Implement conversation history and context management
+- [ ] Create basic UI for chat interface
+
+**Test after Sprint 2:**
+- Test document ingestion with sample SARS PDFs
+- Verify RAG retrieval returns relevant context
+- Test SARS Q&A with common tax questions
+- Validate conversation context is maintained
+
+### Sprint 3 (Week 5-6): Invoice Generation & Dashboard
+- [ ] Build invoice generator with PDF creation (n8n + PDF library)
+- [ ] Create invoice management system (create, send, track)
+- [ ] Develop basic React dashboard with P&L and recent transactions
+- [ ] Implement transaction reconciliation interface
+- [ ] Set up pilot user onboarding process
+- [ ] Create user feedback collection mechanism
+
+**Test after Sprint 3:**
+- Generate sample invoices and verify PDF format
+- Test invoice sending via email
+- Verify dashboard displays correct financial data
+- Test reconciliation workflow
+- Onboard 3-5 pilot users successfully
+
+## Phase 2: Mileage & AR Assistant (Months 3-4)
+
+### Sprint 4 (Week 7-8): Mobile App & GPS Tracking
+- [ ] Set up React Native development environment
+- [ ] Implement background GPS tracking with react-native-background-geolocation
+- [ ] Create n8n endpoints for receiving GPS data
+- [ ] Build trip storage and management system
+- [ ] Develop trip classification workflow with DeepSeek
+- [ ] Create basic mobile UI for trip tracking
+
+**Test after Sprint 4:**
+- Test background GPS tracking on physical devices
+- Verify GPS data is received and stored correctly
+- Test trip classification accuracy
+- Validate mobile app builds for iOS and Android
+
+### Sprint 5 (Week 9-10): Mileage Reporting & Manual Override
+- [ ] Implement manual trip classification override
+- [ ] Build mileage report generation (PDF/CSV compliant with SARS)
+- [ ] Create trip visualization with route mapping
+- [ ] Implement SARS rates integration for claim calculations
+- [ ] Add battery optimization for GPS tracking
+
+**Test after Sprint 5:**
+- Test manual trip correction workflow
+- Generate SARS-compliant mileage reports
+- Verify route mapping displays correctly
+- Test battery consumption during tracking
+
+### Sprint 6 (Week 11-12): Accounts Receivable Automation
+- [ ] Integrate with Stitch API for bank feeds
+- [ ] Build payment matching workflow (DeepSeek + transaction analysis)
+- [ ] Create automated dunning email system
+- [ ] Implement customer credit scoring
+- [ ] Develop DSO (Days Sales Outstanding) tracking
+- [ ] Build AR dashboard and reporting
+
+**Test after Sprint 6:**
+- Test bank feed integration with mock data
+- Verify payment matching accuracy
+- Test dunning email triggers and content
+- Validate credit scoring algorithm
+- Test DSO calculations
+
+## Phase 3: SARS Integration & Advanced Tax (Months 5-6)
+
+### Sprint 7 (Week 13-14): eFiling Research & Assisted Filing
+- [ ] Research SARS eFiling API options and limitations
+- [ ] Build "assisted filing" mode for ITR12 forms
+- [ ] Create document upload and parsing system
+- [ ] Implement data extraction and mapping from uploaded forms
+- [ ] Develop discrepancy highlighting and recommendations
+- [ ] Explore partnership opportunities with tax practitioners
+
+**Test after Sprint 7:**
+- Test ITR12 form upload and parsing
+- Verify data extraction accuracy
+- Test discrepancy detection
+- Validate assisted filing workflow
+
+### Sprint 8 (Week 15-16): Compliance Monitoring
+- [ ] Build daily compliance checks (VAT vs turnover, EMP501 vs payroll)
+- [ ] Create alert system for compliance discrepancies
+- [ ] Implement notification system (email, push)
+- [ ] Develop compliance dashboard
+- [ ] Create audit trail for compliance checks
+
+**Test after Sprint 8:**
+- Test compliance check triggers
+- Verify alert generation for discrepancies
+- Test notification delivery
+- Validate audit trail completeness
+
+### Sprint 9 (Week 17-18): Tax Return Preparation
+- [ ] Build guided tax return Q&A interface
+- [ ] Implement pre-filling from ledger data
+- [ ] Create review and submission workflow
+- [ ] Develop tax optimization recommendations
+- [ ] Build tax deadline calendar with reminders
+
+**Test after Sprint 9:**
+- Test guided Q&A flow
+- Verify pre-filling accuracy from financial data
+- Test review and submission process
+- Validate tax deadline reminders
+
+## Phase 4: Polish, Scale & Advanced Features (Month 7+)
+
+### Sprint 10+ (Ongoing): Advanced Features
+- [ ] Implement visual dashboards with Metabase/Power BI integration
+- [ ] Build document intelligence for receipt processing
+- [ ] Add anomaly detection for unusual transactions
+- [ ] Develop white-label system for accounting firms
+- [ ] Implement multi-currency support
+- [ ] Optimize database and workflows for scale
+- [ ] Add advanced reporting and analytics
+- [ ] Implement AI-powered financial forecasting
+
+**Continuous Testing:**
+- Performance testing with increasing user load
+- Security testing and penetration testing
+- User acceptance testing with pilot groups
+- AI accuracy monitoring and improvement
+- Compliance with POPIA and financial regulations

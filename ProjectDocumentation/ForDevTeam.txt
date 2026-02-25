@@ -1,0 +1,262 @@
+Document 2: For the Developers
+PocketAccountant – Technical Development Plan
+1. Technology Stack Overview
+Component	Technology Choice	Justification
+Workflow Engine	n8n (self‑hosted)	Low‑code, 400+ integrations, perfect for gluing services together.
+AI / LLM	DeepSeek API (or fine‑tuned model)	Cost‑effective, strong reasoning, can be trained on SARS docs.
+Database	PostgreSQL (via Supabase or AWS RDS)	Robust, relational, handles double‑entry accounting.
+Backend API	Node.js / Express (or Python FastAPI)	For custom logic n8n can’t handle.
+Frontend	React (web) + React Native (mobile)	Code reuse across web and mobile.
+Mobile GPS	React Native Background Geolocation plugin	Reliable background tracking.
+Bank Integration	n8n connectors to TrueLayer / Yapily / Stitch	SA‑specific fintech APIs.
+SARS Integration	Reverse‑engineer eFiling or partner with SARS	Start with “assisted filing”, pursue official API later.
+Hosting	AWS Cape Town region (for data sovereignty)	Compliance with POPIA and financial regulations.
+2. System Architecture (High‑Level)
+text
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Mobile App    │────▶│   n8n Server    │────▶│   DeepSeek API  │
+│   (React Native)│     │ (Workflows)     │     │   (AI Engine)    │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                        │                        │
+        │                        │                        │
+        ▼                        ▼                        ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   PostgreSQL    │     │  Bank APIs      │     │  SARS eFiling   │
+│   (Ledger)      │     │  (Stitch, etc.) │     │  (future)       │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+Key n8n Workflows:
+
+Ingest transactions from bank feeds → categorise with DeepSeek → store in DB.
+
+Monitor bank account for incoming payments → match with invoices → update status.
+
+Receive GPS pings → classify trip → calculate mileage claim.
+
+Daily check of tax deadlines → send reminders.
+
+User asks question → send to DeepSeek (with context) → return answer.
+
+3. Development Phases & Action Plan
+Phase 1: MVP (Months 1‑2) – Core Bookkeeping + SARS Q&A
+Goal: Working prototype with manual entry, AI categorisation, and a “Ask SARS” chatbot.
+
+Sprint 1 (Week 1‑2):
+
+Set up n8n server, PostgreSQL, and DeepSeek API connection.
+
+Build simple user authentication (email/password) using n8n or custom backend.
+
+Create a basic ledger schema (accounts, transactions, invoices).
+
+Build n8n workflow for manual transaction entry and DeepSeek categorisation.
+
+Sprint 2 (Week 3‑4):
+
+Collect and clean SARS public documents (guides, ITR12 forms, TaxTim free content).
+
+Fine‑tune DeepSeek or build RAG pipeline (store docs in vector DB, retrieve relevant chunks).
+
+Build n8n workflow: user question → retrieve context → call DeepSeek → return answer.
+
+Sprint 3 (Week 5‑6):
+
+Build simple invoice generator (n8n + PDF generation).
+
+Create a basic dashboard in React (P&L, recent transactions).
+
+Onboard 3‑5 pilot users (freelancers) and run them manually (they enter data, you provide support).
+
+Deliverable: MVP with manual entry, AI categorisation, SARS chatbot, invoice creation.
+
+Phase 2: Mileage & AR Assistant (Months 3‑4)
+Goal: Add mobile app with GPS tracking + automated accounts receivable.
+
+Sprint 4 (Week 7‑8):
+
+Build React Native app with background GPS tracking (using react-native-background-geolocation).
+
+Create n8n endpoint to receive GPS pings, store raw location data.
+
+Build classification workflow: DeepSeek analyses time/location/calendar to label trips as business/personal.
+
+Sprint 5 (Week 9‑10):
+
+Add manual override for trip classification (user can correct).
+
+Generate mileage reports (PDF/CSV) compliant with SARS requirements.
+
+Sprint 6 (Week 11‑12):
+
+Build AR Assistant: n8n workflow polls bank account (via Stitch) daily.
+
+DeepSeek matches incoming payments to open invoices (by amount, reference, customer).
+
+Auto‑update invoice status; send reminder emails via n8n if payment late.
+
+Build simple customer credit scoring (based on payment history).
+
+Deliverable: Mobile mileage tracker, automated payment matching, dunning emails.
+
+Phase 3: SARS Integration & Advanced Tax (Months 5‑6)
+Goal: Direct eFiling integration, real‑time compliance monitoring, tax return prep.
+
+Sprint 7 (Week 13‑14):
+
+Research SARS eFiling API options. If no public API, build “assisted filing” mode:
+
+User downloads ITR12 from eFiling, uploads to PocketAccountant.
+
+DeepSeek extracts data, maps to user’s books, highlights discrepancies.
+
+Alternatively, partner with a tax practitioner firm that has SARS integration.
+
+Sprint 8 (Week 15‑16):
+
+Build compliance monitoring: n8n runs daily checks (e.g., VAT vs. turnover, EMP501 vs payroll).
+
+Alert user via email/push when discrepancies found.
+
+Sprint 9 (Week 17‑18):
+
+Build guided tax return Q&A (like TaxTim but integrated with your books).
+
+DeepSeek pre‑fills answers based on ledger data; user reviews and submits.
+
+Deliverable: Assisted filing, compliance alerts, tax return preparation.
+
+Phase 4: Polish, Scale & Advanced Features (Month 7+)
+Goal: Performance optimisation, white‑label, additional features.
+
+Sprint 10+ (Ongoing):
+
+Implement visual dashboards (connect n8n to Metabase/Power BI).
+
+Build document intelligence: upload PDF receipts → DeepSeek extracts date, amount, vendor → creates expense.
+
+Add anomaly detection: train a simple model (or use DeepSeek prompts) to flag unusual transactions.
+
+White‑label for accountants: multi‑tenant n8n workflows, separate branding, bulk user management.
+
+Implement multi‑currency support (using forex API).
+
+Optimise database and n8n workflows for scale (queueing, caching).
+
+4. Database Schema (Core Tables)
+sql
+-- Users
+CREATE TABLE users (
+  id UUID PRIMARY KEY,
+  email TEXT UNIQUE,
+  name TEXT,
+  tier TEXT, -- free, lite, smart, ultra
+  created_at TIMESTAMP
+);
+
+-- Accounts (Chart of Accounts)
+CREATE TABLE accounts (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users,
+  name TEXT,
+  type TEXT, -- asset, liability, equity, income, expense
+  currency TEXT DEFAULT 'ZAR',
+  balance NUMERIC
+);
+
+-- Transactions
+CREATE TABLE transactions (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users,
+  account_id UUID REFERENCES accounts,
+  date DATE,
+  description TEXT,
+  amount NUMERIC,
+  category TEXT,
+  reconciled BOOLEAN DEFAULT false,
+  metadata JSONB -- bank reference, receipt URL, etc.
+);
+
+-- Invoices
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users,
+  customer_name TEXT,
+  invoice_number TEXT,
+  issue_date DATE,
+  due_date DATE,
+  total NUMERIC,
+  status TEXT, -- draft, sent, paid, overdue
+  line_items JSONB
+);
+
+-- Trips
+CREATE TABLE trips (
+  id UUID PRIMARY KEY,
+  user_id UUID REFERENCES users,
+  start_time TIMESTAMP,
+  end_time TIMESTAMP,
+  start_location TEXT,
+  end_location TEXT,
+  distance_km NUMERIC,
+  purpose TEXT, -- business, personal
+  metadata JSONB -- route polyline, etc.
+);
+5. Integration Points
+Integration	Method	Notes
+Bank Feeds	n8n HTTP node + Stitch API	Stitch provides SA bank connectivity.
+DeepSeek	HTTP request with API key	Use prompt engineering + fine‑tuning for SARS knowledge.
+Email	n8n Email node (SMTP)	For reminders, reports.
+SMS	n8n Twilio node	Optional for urgent alerts.
+SARS eFiling	Custom reverse‑engineering or partner	Start with manual upload/download.
+Mobile GPS	Webhook calls from React Native app to n8n endpoint	Secure with API keys.
+6. Security & Compliance
+Data Encryption: Encrypt sensitive data at rest (AES‑256) and in transit (TLS 1.3).
+
+Authentication: Use JWT or session‑based auth; implement MFA for higher tiers.
+
+Data Residency: All data stored in AWS Cape Town region (POPIA compliance).
+
+Audit Logs: n8n workflows log all actions; store immutable logs.
+
+AI Explainability: Every AI decision (categorisation, prediction) stores a confidence score and reasoning (for audit).
+
+Third‑party Security: Regularly review bank API partners (Stitch, etc.) for security compliance.
+
+7. Testing Strategy
+Test Type	Tools	Approach
+Unit Tests	Jest (Node) / PyTest	Test individual functions (e.g., ledger calculations).
+Integration Tests	n8n test nodes + Postman	Test workflows end‑to‑end with mock data.
+AI Accuracy Tests	Custom scripts	Run batch of historical transactions, compare AI categorisation to human labels.
+User Acceptance	Pilot users	Monthly feedback sessions.
+Load Tests	K6 / Artillery	Simulate thousands of concurrent users.
+8. Deployment & DevOps
+n8n: Deploy via Docker on AWS EC2 or ECS; use RDS for PostgreSQL.
+
+Frontend: Host React app on AWS S3 + CloudFront.
+
+Mobile App: Publish to App Store / Google Play via Expo or manual builds.
+
+CI/CD: GitHub Actions for automated testing and deployment.
+
+Monitoring: Prometheus + Grafana for n8n and backend metrics; Sentry for error tracking.
+
+9. Getting Started (Next Steps for the Developer)
+Set up your local environment:
+
+Install Docker, Node.js, Python.
+
+Clone starter repos (if any).
+
+Run n8n locally and create a test workflow that calls DeepSeek.
+
+Design the database schema (start with Airtable for rapid prototyping, then migrate to PostgreSQL).
+
+Build the “Ask SARS” bot – collect 100+ FAQs and responses, test with DeepSeek.
+
+Create a simple web form for pilot users to sign up and enter transactions.
+
+Iterate based on pilot feedback.
+
+Final Thoughts
+PocketAccountant is not just another accounting app—it’s an AI‑first platform tailored to the South African market. With n8n and DeepSeek, you can build 80% of the functionality with minimal custom code. Focus on delivering a delightful user experience and let the AI handle the complexity.
+
+Good luck, and may your mission succeed!

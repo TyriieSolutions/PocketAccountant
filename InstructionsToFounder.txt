@@ -1,0 +1,253 @@
+# Instructions to Founder - PocketAccountant Setup Requirements
+
+Dear Founder,
+
+To successfully develop and deploy PocketAccountant, we need you to set up the following accounts and credentials. These are essential for the development, testing, and eventual production deployment of the platform.
+
+## 1. GitHub Account & Repository Setup
+
+### Required Actions:
+- [ ] **Create a GitHub account** (if you don't have one): https://github.com
+- [ ] **Create a new repository** named "PocketAccountant"
+- [ ] **Enable GitHub Actions** for CI/CD
+- [ ] **Set up repository secrets** for:
+  - AWS credentials (for deployment)
+  - Docker Hub credentials (if using)
+  - API keys (DeepSeek, Stitch, etc.)
+
+### Repository Structure:
+```
+PocketAccountant/
+├── backend/          # Node.js/Express API
+├── frontend/         # React web application
+├── mobile/          # React Native mobile app
+├── workflows/       # n8n workflow exports
+├── docker/          # Docker configurations
+├── docs/           # Documentation
+└── ProjectDocumentation/ # Existing documentation
+```
+
+## 2. DeepSeek API Account
+
+### Required Actions:
+- [ ] **Sign up for DeepSeek API**: https://platform.deepseek.com
+- [ ] **Obtain API key** with sufficient quota for development
+- [ ] **Note billing information** and set up payment method
+- [ ] **Test API access** with sample prompts
+
+### Usage Notes:
+- We'll use DeepSeek for AI-powered categorization, Q&A, and tax assistance
+- Consider the "pro" tier for higher rate limits during development
+- Keep API key secure - we'll store it in environment variables
+
+## 3. Stitch API Account (Bank Integration)
+
+### Required Actions:
+- [ ] **Sign up for Stitch API**: https://stitch.money
+- [ ] **Apply for developer access** and sandbox environment
+- [ ] **Obtain client ID and secret** for API authentication
+- [ ] **Test with South African bank sandboxes**
+
+### Important Notes:
+- Stitch provides connectivity to major SA banks (FNB, ABSA, Standard Bank, etc.)
+- We'll start with sandbox/testing environment
+- Production access may require additional compliance checks
+
+## 4. AWS Account Setup (Cape Town Region)
+
+### Required Actions:
+- [ ] **Create AWS account** (if you don't have one): https://aws.amazon.com
+- [ ] **Enable Cape Town region** (af-south-1) for data sovereignty
+- [ ] **Set up IAM user** with appropriate permissions for:
+  - EC2/ECS (container hosting)
+  - RDS (PostgreSQL database)
+  - S3 (file storage)
+  - CloudFront (CDN)
+  - Route 53 (DNS)
+- [ ] **Generate access keys** for programmatic access
+- [ ] **Set up billing alerts** to monitor costs
+
+### AWS Services Required:
+1. **EC2/ECS**: For hosting n8n and backend services
+2. **RDS**: PostgreSQL database (multi-AZ for high availability)
+3. **S3**: Storage for receipts, documents, and backups
+4. **CloudFront**: Content delivery for web app
+5. **Route 53**: Domain management and DNS
+6. **CloudWatch**: Monitoring and logging
+
+## 5. Domain Name Registration
+
+### Required Actions:
+- [ ] **Register domain name** (suggestions: pocketaccountant.co.za, mypocketaccountant.co.za)
+- [ ] **Set up DNS records** in Route 53
+- [ ] **Configure SSL certificates** via AWS Certificate Manager
+
+### Domain Suggestions:
+- Primary: `pocketaccountant.co.za`
+- Development: `dev.pocketaccountant.co.za`
+- API: `api.pocketaccountant.co.za`
+
+## 6. Docker Hub Account (Optional)
+
+### Required Actions:
+- [ ] **Create Docker Hub account**: https://hub.docker.com
+- [ ] **Create repositories** for:
+  - n8n custom image
+  - Backend API image
+  - Any other custom containers
+
+### Alternative:
+We can use AWS ECR (Elastic Container Registry) instead of Docker Hub
+
+## 7. Email Service Provider
+
+### Required Actions:
+- [ ] **Choose email service** (options: SendGrid, Amazon SES, Mailgun)
+- [ ] **Set up sending domain** and verify ownership
+- [ ] **Configure DKIM/SPF records** for email deliverability
+- [ ] **Obtain API credentials** for transactional emails
+
+### Email Types Needed:
+- User registration confirmations
+- Password resets
+- Invoice notifications
+- Payment reminders
+- Tax deadline alerts
+
+## 8. SMS Service Provider (Optional)
+
+### Required Actions:
+- [ ] **Choose SMS service** (options: Twilio, Clickatell, AWS SNS)
+- [ ] **Set up phone number** for sending SMS
+- [ ] **Obtain API credentials**
+- [ ] **Test SMS delivery**
+
+### Use Cases:
+- Urgent payment reminders
+- Two-factor authentication
+- Important alerts
+
+## 9. SARS Documentation Access
+
+### Required Actions:
+- [ ] **Collect SARS public documents**:
+  - ITR12 forms and guides
+  - VAT guides and forms
+  - EMP501 guides
+  - Tax calculation guides
+- [ ] **Organize documents** for AI training
+- [ ] **Consider partnership** with tax practitioner for expert knowledge
+
+### Note:
+We'll use these documents to train our AI and build the SARS knowledge base
+
+## 10. Mobile App Stores
+
+### Required Actions:
+- [ ] **Create Apple Developer account** ($99/year): https://developer.apple.com
+- [ ] **Create Google Play Developer account** ($25 one-time): https://play.google.com/console
+- [ ] **Prepare app store assets** (icons, screenshots, descriptions)
+- [ ] **Set up app signing certificates**
+
+### Timeline:
+We'll need these accounts ready before Phase 2 (mobile app development)
+
+## 11. Payment Gateway (Future)
+
+### Research Options:
+- [ ] **PayFast** (South African)
+- [ ] **Yoco**
+- [ ] **PayStack** (for Africa)
+- [ ] **Stripe** (if expanding beyond SA)
+
+### Notes:
+We'll implement payment processing in Phase 4 for subscription billing
+
+## 12. Legal & Compliance
+
+### Required Actions:
+- [ ] **Consult with lawyer** for:
+  - Terms of Service
+  - Privacy Policy (POPIA compliant)
+  - Data processing agreements
+- [ ] **Register business** if not already done
+- [ ] **Consider POPIA compliance officer** appointment
+
+## 13. Team Collaboration Tools
+
+### Recommended Setup:
+- [ ] **Slack/Discord** for team communication
+- [ ] **Notion/Confluence** for documentation
+- [ ] **Figma** for UI/UX design
+- [ ] **Jira/Trello** for project management
+
+## Priority Order:
+
+### Immediate (Week 1):
+1. GitHub account and repository
+2. DeepSeek API account
+3. AWS account setup (Cape Town region)
+4. Domain name registration
+
+### Short-term (Week 2-3):
+5. Stitch API sandbox access
+6. Email service provider
+7. SARS documentation collection
+
+### Medium-term (Month 1-2):
+8. Docker Hub/ECR setup
+9. Legal consultation
+10. Team collaboration tools
+
+### Long-term (Before launch):
+11. Mobile app store accounts
+12. Payment gateway integration
+13. Production Stitch API access
+
+## Security Notes:
+
+1. **Never commit credentials** to version control
+2. Use **environment variables** and secret management
+3. Enable **multi-factor authentication** on all accounts
+4. Regularly **rotate API keys** and passwords
+5. Maintain **access logs** for audit purposes
+
+## Budget Estimates:
+
+### Monthly Costs (Development Phase):
+- DeepSeek API: $50-200 (depending on usage)
+- AWS Services: $100-300 (development environment)
+- Email Service: $20-50
+- Domain: ~$15/year
+
+### One-time Costs:
+- Apple Developer: $99/year
+- Google Play: $25 one-time
+- Legal consultation: $500-2000
+
+## Next Steps After Setup:
+
+Once you've completed these setups, please provide:
+1. GitHub repository URL
+2. DeepSeek API key (securely)
+3. AWS access keys (securely)
+4. Domain name confirmation
+5. Any other credentials as obtained
+
+We'll then proceed with:
+1. Setting up the development environment
+2. Creating CI/CD pipeline
+3. Building the MVP (Phase 1)
+
+## Contact for Assistance:
+
+If you need help with any of these setups, I can:
+- Provide step-by-step guides for specific services
+- Recommend service providers based on your needs
+- Assist with configuration where possible
+
+Let me know which items you'd like to tackle first, and we can prioritize accordingly.
+
+Best regards,
+Development Team
+PocketAccountant Project

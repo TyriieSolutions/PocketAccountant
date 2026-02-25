@@ -1,0 +1,360 @@
+# PocketAccountant Error Troubleshooting Guide
+
+## Common Errors and Solutions
+
+### Docker-Related Errors
+
+#### Error: "Cannot connect to the Docker daemon"
+**Symptoms**: Docker commands fail with connection errors
+**Possible Causes**:
+1. Docker Desktop not running
+2. Docker service stopped
+3. Permission issues
+
+**Solutions**:
+1. Start Docker Desktop application
+2. Run as administrator if on Windows
+3. Check Docker service status: `sc query docker`
+4. Restart Docker service: `net stop docker` then `net start docker`
+
+#### Error: "Port already in use" when starting containers
+**Symptoms**: Docker compose fails with port conflict errors
+**Common Ports**:
+- n8n: 5678
+- PostgreSQL: 5432
+- React dev server: 3000
+
+**Solutions**:
+1. Identify process using port: `netstat -ano | findstr :<PORT>`
+2. Stop the conflicting process or change port in docker-compose.yml
+3. For n8n: Change `N8N_PORT` environment variable
+4. For PostgreSQL: Change port mapping in docker-compose
+
+#### Error: "Volume mounting failed" on Windows
+**Symptoms**: Docker complains about volume paths
+**Causes**: Windows path format issues
+
+**Solutions**:
+1. Use absolute paths with forward slashes: `/c/Projects/PocketAccountant/data`
+2. Or use Windows style with escaped backslashes: `C:\\Projects\\PocketAccountant\\data`
+3. Check Docker Desktop file sharing settings
+
+### Database Errors
+
+#### Error: "Connection refused" to PostgreSQL
+**Symptoms**: Application can't connect to database
+**Causes**:
+1. PostgreSQL container not running
+2. Wrong credentials
+3. Network configuration issues
+
+**Solutions**:
+1. Check if PostgreSQL container is running: `docker ps`
+2. Verify credentials in environment variables
+3. Check network configuration in docker-compose
+4. Test connection manually: `docker exec -it postgres_container psql -U username -d databasename`
+
+#### Error: "Relation does not exist"
+**Symptoms**: SQL queries fail on tables that should exist
+**Causes**:
+1. Migration not run
+2. Wrong schema name
+3. Case sensitivity issues
+
+**Solutions**:
+1. Run database migrations: `npm run migrate` or equivalent
+2. Check schema name in connection string
+3. Use double quotes for case-sensitive table names in PostgreSQL
+
+#### Error: "Deadlock detected"
+**Symptoms**: Concurrent transactions failing
+**Causes**: Multiple transactions trying to update same rows
+
+**Solutions**:
+1. Implement retry logic with exponential backoff
+2. Use `SELECT FOR UPDATE` for critical sections
+3. Reduce transaction isolation level if appropriate
+4. Implement queue system for high-concurrency operations
+
+### n8n Workflow Errors
+
+#### Error: "Webhook timeout"
+**Symptoms**: n8n webhook calls timing out
+**Causes**:
+1. Slow response from external API
+2. Network issues
+3. Workflow too complex
+
+**Solutions**:
+1. Increase timeout in n8n settings
+2. Implement async processing with webhook response first
+3. Optimize workflow complexity
+4. Add error handling and retry nodes
+
+#### Error: "Credential not found"
+**Symptoms**: n8n can't find stored credentials
+**Causes**:
+1. Credential not saved properly
+2. Wrong credential name reference
+3. Permission issues
+
+**Solutions**:
+1. Recreate the credential in n8n UI
+2. Check credential name in workflow JSON
+3. Verify n8n has write access to credential storage
+
+#### Error: "Maximum call stack size exceeded"
+**Symptoms**: Recursive workflow causing stack overflow
+**Causes**: Infinite loop in workflow
+
+**Solutions**:
+1. Add loop detection with counter nodes
+2. Implement maximum iteration limits
+3. Use "Wait" nodes to prevent rapid recursion
+4. Review workflow logic for circular references
+
+### DeepSeek API Errors
+
+#### Error: "API rate limit exceeded"
+**Symptoms**: DeepSeek API returning 429 errors
+**Causes**: Too many requests in short period
+
+**Solutions**:
+1. Implement request queuing with delays
+2. Add exponential backoff for retries
+3. Cache common responses
+4. Monitor and adjust request frequency
+
+#### Error: "Invalid API key"
+**Symptoms**: Authentication failures
+**Causes**:
+1. Wrong API key
+2. Key expired or revoked
+3. Environment variable not set
+
+**Solutions**:
+1. Verify API key in n8n credentials
+2. Check DeepSeek account for key status
+3. Test key with simple curl command
+4. Rotate to new API key if compromised
+
+#### Error: "Context length exceeded"
+**Symptoms**: API rejects requests with too much text
+**Causes**: Prompt too long for model context window
+
+**Solutions**:
+1. Truncate or summarize input
+2. Use RAG to retrieve only relevant context
+3. Split large documents into chunks
+4. Use models with larger context windows if available
+
+### React/React Native Errors
+
+#### Error: "Module not found"
+**Symptoms**: Import errors in React components
+**Causes**:
+1. Wrong file path
+2. Package not installed
+3. Case sensitivity issues
+
+**Solutions**:
+1. Check import path spelling
+2. Run `npm install` or `yarn install`
+3. Clear cache: `npm cache clean --force`
+4. Delete node_modules and reinstall
+
+#### Error: "Network request failed" in React Native
+**Symptoms**: API calls failing on mobile
+**Causes**:
+1. Wrong URL (localhost vs device IP)
+2. SSL certificate issues
+3. Network permissions missing
+
+**Solutions**:
+1. Use device IP instead of localhost for development
+2. Add network security config for Android
+3. Configure App Transport Security for iOS
+4. Check React Native debugger network tab
+
+#### Error: "GPS permission denied"
+**Symptoms**: Location services not working
+**Causes**:
+1. Permission not requested
+2. User denied permission
+3. Background location not enabled
+
+**Solutions**:
+1. Request permissions at runtime
+2. Handle permission denial gracefully
+3. Explain why background location is needed
+4. Guide user to app settings to enable permissions
+
+### Bank Integration Errors (Stitch API)
+
+#### Error: "Invalid credentials"
+**Symptoms**: Can't connect to bank accounts
+**Causes**:
+1. Bank login credentials changed
+2. Stitch API key issues
+3. Bank maintenance or outages
+
+**Solutions**:
+1. Prompt user to re-authenticate
+2. Check Stitch API status page
+3. Implement credential refresh flow
+4. Log detailed error for debugging
+
+#### Error: "Consent required"
+**Symptoms**: Need user re-authorization
+**Causes**: Bank consent expired or revoked
+
+**Solutions**:
+1. Implement consent renewal flow
+2. Store consent expiration dates
+3. Notify users before consent expires
+4. Provide easy re-authorization process
+
+### SARS Integration Errors
+
+#### Error: "Document parsing failed"
+**Symptoms**: Can't extract data from uploaded tax forms
+**Causes**:
+1. Unsupported document format
+2. Poor scan quality
+3. Complex form layout
+
+**Solutions**:
+1. Validate document format on upload
+2. Provide scanning guidelines to users
+3. Implement multiple parsing strategies
+4. Allow manual data entry as fallback
+
+#### Error: "Data validation failed"
+**Symptoms**: Extracted data doesn't match expected format
+**Causes**:
+1. OCR errors
+2. Form version differences
+3. User entered incorrect data
+
+**Solutions**:
+1. Implement data validation rules
+2. Highlight discrepancies for user review
+3. Provide helpful error messages
+4. Allow manual correction
+
+### Performance Issues
+
+#### Issue: "Slow dashboard loading"
+**Symptoms**: Financial reports take too long to load
+**Causes**:
+1. Large dataset queries
+2. No indexing on database
+3. Complex calculations
+
+**Solutions**:
+1. Add database indexes on frequently queried columns
+2. Implement pagination for large datasets
+3. Cache calculation results
+4. Use materialized views for complex reports
+
+#### Issue: "High memory usage"
+**Symptoms**: Application using excessive memory
+**Causes**:
+1. Memory leaks
+2. Large file processing
+3. Inefficient data structures
+
+**Solutions**:
+1. Profile memory usage with Chrome DevTools or similar
+2. Implement streaming for large file processing
+3. Use pagination instead of loading all data
+4. Regularly update dependencies
+
+### Deployment Errors
+
+#### Error: "Build failed" in CI/CD
+**Symptoms**: Automated deployment failing
+**Causes**:
+1. Test failures
+2. Dependency issues
+3. Configuration errors
+
+**Solutions**:
+1. Check CI/CD logs for specific error
+2. Run tests locally to reproduce
+3. Verify environment variables in CI
+4. Check for version conflicts
+
+#### Error: "Service unavailable" after deployment
+**Symptoms**: Application not responding
+**Causes**:
+1. Database connection issues
+2. Wrong port mappings
+3. Resource constraints
+
+**Solutions**:
+1. Check container logs: `docker logs <container_name>`
+2. Verify health checks are passing
+3. Check resource usage (CPU, memory)
+4. Review deployment configuration
+
+## Debugging Procedures
+
+### General Debugging Steps:
+1. **Reproduce the error**: Note exact steps to trigger
+2. **Check logs**: Application, database, and system logs
+3. **Isolate the component**: Determine which service is failing
+4. **Simplify the scenario**: Remove unnecessary variables
+5. **Search for similar issues**: Check documentation and forums
+6. **Test fixes in isolation**: Before applying to production
+
+### Log Locations:
+- **n8n**: Docker logs or n8n log files
+- **PostgreSQL**: Database logs in Docker volume
+- **React/Node.js**: Application logs and console output
+- **AWS**: CloudWatch logs for deployed services
+
+### Monitoring Tools:
+1. **Docker Desktop**: Container status and logs
+2. **pgAdmin**: PostgreSQL database management
+3. **n8n UI**: Workflow execution history
+4. **React DevTools**: Component state and props
+5. **Network tab**: API request/response inspection
+
+## Prevention Strategies
+
+### Code Quality:
+1. Implement comprehensive testing
+2. Use TypeScript for type safety
+3. Follow coding standards and reviews
+4. Document complex logic
+
+### Infrastructure:
+1. Use infrastructure as code (Terraform/CloudFormation)
+2. Implement monitoring and alerting
+3. Regular backup and recovery testing
+4. Security scanning and updates
+
+### Operations:
+1. Maintain runbooks for common procedures
+2. Regular security audits
+3. Performance testing under load
+4. Disaster recovery planning
+
+## Emergency Contacts
+
+### Technical Support:
+- **Docker Issues**: Docker Desktop support documentation
+- **n8n Support**: n8n community forum and GitHub issues
+- **DeepSeek API**: DeepSeek developer support
+- **Stitch API**: Stitch technical support
+- **AWS Support**: AWS technical account manager
+
+### Compliance & Legal:
+- **SARS Compliance**: Tax practitioner consultant
+- **POPIA Compliance**: Data protection officer
+- **Legal Counsel**: For terms of service and privacy policy
+
+## Version History
+- **v1.0**: Initial troubleshooting guide created (Feb 25, 2026)
+- **Updates**: This document will be updated as new errors are encountered and resolved
